@@ -1,0 +1,9 @@
+model:
+  provider: openai_compat
+  base_url: ${ENV:LLM_BASE_URL:-http://localhost:11434/v1}
+  api_key: ${ENV:LLM_API_KEY:-ollama}
+  model: ${ENV:LLM_MODEL:-qwen2.5-coder:32b}
+  native_tools: true
+  context_window: 32768
+  max_output_tokens: 4096
+  schema_level: standard

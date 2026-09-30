@@ -1,0 +1,168 @@
+{
+ "known_tools": [
+  "get_weather",
+  "read_file",
+  "edit_file",
+  "bash",
+  "search-code",
+  "mcp__fs__list"
+ ],
+ "cases": [
+  {
+   "text": "{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "bare_json",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "  {\"tool\": \"get_weather\", \"args\": {\"city\": \"Paris\"}}\n",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "bare_json",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "[{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}, {\"name\": \"read_file\", \"arguments\": {\"path\": \"a\"}}]",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    },
+    {
+     "name": "read_file",
+     "arguments": {
+      "path": "a"
+     }
+    }
+   ],
+   "strategy": "bare_json",
+   "remaining": "",
+   "errors": [
+    null,
+    null
+   ]
+  },
+  {
+   "text": "{\"function\": {\"name\": \"get_weather\", \"arguments\": \"{\\\"city\\\": \\\"Paris\\\"}\"}}",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "bare_json",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "{\"name\": \"get_weather\", \"input\": {\"city\": \"Paris\"}}",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "bare_json",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "{'name': 'get_weather', 'arguments': {'city': 'Paris'}}",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "bare_json",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\",}}",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "bare_json",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "{\"name\": \"bash\", \"arguments\": {\"command\": \"echo hi\"}}",
+   "calls": [
+    {
+     "name": "bash",
+     "arguments": {
+      "command": "echo hi"
+     }
+    }
+   ],
+   "strategy": "bare_json",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "{\"name\": \"nonexistent_tool\", \"arguments\": {\"x\": 1}}",
+   "calls": [
+    {
+     "name": "nonexistent_tool",
+     "arguments": {}
+    }
+   ],
+   "strategy": "bare_json",
+   "remaining": "",
+   "errors": [
+    "unknown tool"
+   ]
+  },
+  {
+   "text": "{\"answer\": 42}",
+   "calls": [],
+   "strategy": null,
+   "remaining": "{\"answer\": 42}",
+   "errors": []
+  }
+ ]
+}

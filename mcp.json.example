@@ -1,0 +1,6 @@
+{
+  "mcpServers": {
+    "filesystem": {"command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "/work"], "env": {}},
+    "remote": {"type": "http", "url": "https://example.com/mcp", "headers": {"Authorization": "Bearer ${ENV:TOKEN}"}}
+  }
+}

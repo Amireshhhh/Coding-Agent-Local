@@ -1,0 +1,62 @@
+# DECISIONS
+
+One line per decision the build plan left open (rule 8). "Simplest option" unless noted.
+
+- Canonical `validate_transcript()` lives in `agent/types.py` (next to the contract it checks) and rejects orphan tool results, duplicate ids and tool_calls on non-assistant messages.
+- `ToolSpec.name` is validated against `^[a-zA-Z0-9_-]{1,64}$` at construction time.
+- Config: unknown keys are rejected (`extra="forbid"`) so typos surface as errors naming the key.
+- Config: YAML 1.1 parses a bare `off` as `false`; `guided_decoding: off` is mapped back to `"off"`.
+- Config: `model.tokenizer` wins over `model.http.tokenizer`; default counter is `chars_div_4`.
+- Config: `supports_tool_role` defaults to `false` for prompted backends (tool results become `<tool_response>` user messages).
+- Schema `standard`: `$schema`/`title`/`examples`/`$id`/`$comment` are dropped everywhere; `default` is dropped only on non-required properties (literal reading of 4.2).
+- Schema `standard`: `additionalProperties:false` is forced on objects that declare `properties` (and always on the top level); property-less objects stay free-form maps, otherwise they could never receive data.
+- Schema: "nesting depth" counts object/array levels below the root; containers deeper than 3 become `{"type": <type>, "description": "... (nested structure omitted)"}`.
+- Schema `simple`: when collapsing `oneOf/anyOf/allOf` to the first branch, the parent's keywords (e.g. its description) win over the branch's.
+- Schema `simple`: every object below the root is flattened to `{"type":"object","description":"... JSON object with keys: a, b"}`, including array items.
+- Recursive or unresolvable `$ref`s are replaced by a generic object and reported as information loss.
+- Registry: arguments are validated against the ORIGINAL schema; if it is not a valid schema (or fails at validation time) the normalized `standard` schema is used.
+- Registry: coercion runs only after a validation failure, then validation is repeated; string values are never coerced when the schema allows `string`.
+- Registry: `asyncio.CancelledError` propagates (so Ctrl-C can cancel a turn); every other exception becomes a tool message.
+- Parser: `<think>...</think>` blocks are masked before extraction, so example calls inside reasoning are never executed.
+- Parser: text from the first fabricated tool response (`<tool_response` or a line starting `Observation:`) after the first call is dropped, together with any calls after it.
+- Parser: a strongly-marked call (hermes tag, ```tool_call fence, python_tag, [TOOL_CALLS], `{"tool_calls":...}`) whose JSON cannot be repaired yields a `parse_error` call, so the repair loop / registry error path can react.
+- Parser: Mistral v11 syntax `[TOOL_CALLS]name[ARGS]{...}` is accepted in addition to the JSON-array form.
+- Parser: pythonic calls also accept the Llama-3.2 list form `[a(x=1), b(y=2)]`; positional arguments produce a `parse_error`.
+- `repair_json` returns only dicts; `repair_json_value` (same steps) is used internally for arrays.
+- Adapters: if the provider finishes with `length` while tool calls exist, the last call is flagged `parse_error` ("output was cut off") instead of executing possibly truncated arguments.
+- OpenAI-compatible text backend: at most 4 stop sequences are sent (OpenAI API limit); extra ones are dropped with a warning.
+- Streaming (OpenAI): a tool call is emitted when the next index starts (index closed) or at stream end, only if its arguments parse; calls with parse errors appear only in the final `done` response.
+- Streaming (prompted): text is streamed until anything that may start tool markup (`<tool_call>`, a code fence, `[TOOL_CALLS]`, `<|python_tag|>`, `{"tool_calls"`, `<think>`); held-back text is emitted at the end if no call was found.
+- Guided decoding: the constrained output is `{"answer": str}` or `{"tool_calls": [oneOf over tools]}`; the `answer` form is converted back to plain text. vLLM uses `guided_json`, llama.cpp uses `json_schema` (see PROBES: unverified live).
+- AutoFallbackAdapter: the factory returns a wrapper that swaps itself to the prompted adapter on the first `NativeToolsUnsupported` and retries the call; a second rejection is raised.
+- custom_http: `input_mode: messages` maps to a `chat` backend; `prompt` maps to a `completion` backend rendered with `prompt_format`.
+- custom_http native tools: the rendered `request_tools_template` object is merged (top-level `dict.update`) into the rendered request body.
+- Context: the project instructions file (AGENT.md) is appended to the system prompt, so it is pinned as part of the system message.
+- Context: pinned = system messages, the first real user message, the most recent real user message (summaries excluded), and the final unit if it is an assistant tool-call group (the in-flight turn).
+- Context: "turns" for `keep_recent_tool_results` = assistant tool-call groups; the pinned in-flight group is never cleared.
+- Context: stage 1 re-truncates stored tool messages only if they exceed the limit by more than 64 tokens (room for the marker), which makes it idempotent.
+- Context: stages 2-3 run when the estimate exceeds `compact_threshold * budget`; stage 4 only while it exceeds the budget.
+- Context: the summarizer receives a plain-text rendering of the range (no tool-role messages), so the request is valid for every adapter with `tools=None`.
+- Context: a failed compaction is logged and the pipeline continues with stage 4.
+- Context: `/compact` forces stages 2-3 regardless of the threshold.
+- Persistence: message lines are canonical Message JSON; event lines carry an `event` key. On resume, tool calls without results are answered with "interrupted" results.
+- MCP: each server connection lives in its own asyncio task, because the SDK's anyio cancel scopes must be entered and exited in the same task.
+- MCP: if a connection drops DURING a call the server is reconnected but the call is NOT repeated (it may have had side effects); if it was already closed BEFORE sending, it reconnects and retries once.
+- MCP: `list_changed` refresh runs in a background task (awaiting `tools/list` inside the SDK message handler would deadlock).
+- MCP: stdio server stderr goes to `~/.agent/logs/mcp-<name>.log`.
+- MCP: name collisions after sanitization get the 6-char hash suffix too.
+- MCP: a server is `degraded` after `degraded_after_failures` (default 3) consecutive failed calls and returns to `connected` after a success.
+- Permissions: read-only builtin tools are allowed in `ask` mode; tools with `requires_approval` (MCP, web) ask on first use; "always" approves that tool for the session.
+- Permissions: evaluation order is sandbox -> dangerous-command denylist -> deny rules -> plan mode -> allow rules -> bypass -> session approvals -> mode defaults. The denylist and the path sandbox apply even in `bypass`.
+- Permissions: a glob allow rule never approves a bash command containing chaining/substitution/redirection (`; & | \` $( > <` or newline) unless the rule itself contains such characters.
+- Without an interactive approver (e.g. `agent -p`), `ask` decisions are denials with a message explaining how to allow the call.
+- write_file refuses to overwrite an existing file that was not read in this session (same precondition as edit_file); edit_file also refuses if the file changed on disk since it was read.
+- bash: the working directory persists through a marker line appended to each command; `cd` outside the project root is ignored.
+- Parallel execution: consecutive read-only calls run concurrently; everything else runs sequentially in call order; results are always appended in call order.
+- Loop detection: the same tool+arguments 3 times in a row (within the current user turn) injects a reminder user message.
+- Usage: if a provider reports no usage, the loop records its own estimates (context estimate for prompt, counter for completion).
+- Sub-agents: default tools are read-only tools that do not require approval; the `task` tool itself is marked read-only and is never given to a child.
+- Hooks: a pre hook exiting non-zero blocks the call; post hook failures are appended to the tool result and logged.
+- Checkpoints: one per user turn, taken before the first mutating tool; implemented with a temporary index so HEAD, branches and the user's index are untouched.
+- Docker compose: the `ollama` and `vllm` agent services sit on an `internal: true` network (no internet egress); the in-house profile needs egress to reach the endpoint.
+- Evals: tasks are defined in code (`evals/tasks.py`), each with a reference solution; `--self-check` proves every task fails at baseline and passes with its solution.

@@ -1,0 +1,27 @@
+# agent.yaml - copy to agent.yaml and edit. ${ENV:NAME} / ${ENV:NAME:-default} are interpolated.
+model:
+  provider: openai_compat          # openai_compat | prompted | custom_http
+  base_url: http://localhost:11434/v1
+  api_key: ${ENV:LLM_API_KEY:-none}
+  model: qwen2.5-coder:32b
+  native_tools: true               # false -> wrapped by the prompted adapter
+  context_window: 32768
+  max_output_tokens: 4096
+  temperature: 0.2
+  schema_level: standard           # full | standard | simple
+  prompted_tool_format: hermes     # hermes | json_fence | custom
+  tool_choice: auto
+  timeout_s: 300
+  max_retries: 3
+  tokenizer:
+    kind: chars_div_4              # chars_div_4 | tiktoken | hf | server
+context:
+  compact_threshold: 0.8
+  max_tool_output_tokens: 4000
+  keep_recent_tool_results: 6
+  project_instructions_file: AGENT.md
+permissions:
+  mode: ask                        # ask | accept_edits | plan | bypass
+  allow: ["bash(git status)", "bash(git diff*)"]
+  deny: ["bash(rm -rf /*)"]
+max_iterations: 50

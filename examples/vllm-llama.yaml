@@ -1,0 +1,16 @@
+# Server: vllm serve meta-llama/Llama-3.1-8B-Instruct --enable-auto-tool-choice --tool-call-parser llama3_json
+model:
+  provider: openai_compat
+  base_url: ${ENV:LLM_BASE_URL:-http://localhost:8000/v1}
+  api_key: ${ENV:LLM_API_KEY:-none}
+  model: ${ENV:LLM_MODEL:-meta-llama/Llama-3.1-8B-Instruct}
+  native_tools: true
+  context_window: 32768
+  max_output_tokens: 4096
+  schema_level: standard
+  guided_decoding: off
+  tokenizer:
+    kind: server
+    url: ${ENV:LLM_TOKENIZE_URL:-http://localhost:8000/tokenize}
+    request_field: prompt
+    count_path: "$.count"

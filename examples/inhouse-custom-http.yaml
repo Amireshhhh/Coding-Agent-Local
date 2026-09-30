@@ -1,0 +1,29 @@
+model:
+  provider: custom_http
+  context_window: 16384
+  max_output_tokens: 2048
+  schema_level: simple
+  http:
+    endpoint: ${ENV:INHOUSE_ENDPOINT:-https://llm.internal/v1/generate}
+    method: POST
+    headers:
+      Authorization: "Bearer ${ENV:INHOUSE_KEY}"
+      Content-Type: application/json
+    input_mode: prompt
+    prompt_format: chatml
+    request_template: |
+      {"inputs": {{ prompt | tojson }},
+       "parameters": {"max_new_tokens": {{ max_tokens }}, "temperature": {{ temperature }}, "stop": {{ stop | tojson }}}}
+    response:
+      text_path: "$.generated_text"
+      finish_reason_path: "$.finish_reason"
+      usage_prompt_path: "$.usage.input"
+      usage_completion_path: "$.usage.output"
+      error_path: "$.error"
+    stream:
+      enabled: false
+      format: sse
+      delta_path: "$.token.text"
+      done_marker: "[DONE]"
+    tokenizer:
+      kind: chars_div_4

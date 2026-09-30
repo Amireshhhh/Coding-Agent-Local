@@ -1,0 +1,197 @@
+{
+ "known_tools": [
+  "get_weather",
+  "read_file",
+  "edit_file",
+  "bash",
+  "search-code",
+  "mcp__fs__list"
+ ],
+ "cases": [
+  {
+   "text": "<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}\n</tool_call>",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "Let me check.\n<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}\n</tool_call>",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": "Let me check.",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "<tool_call>{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}</tool_call>\n<tool_call>{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Rome\"}}</tool_call>",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    },
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Rome"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": "",
+   "errors": [
+    null,
+    null
+   ]
+  },
+  {
+   "text": "<tool_call>\n{\"name\": \"read_file\", \"parameters\": {\"path\": \"src/a.py\"}}\n</tool_call>",
+   "calls": [
+    {
+     "name": "read_file",
+     "arguments": {
+      "path": "src/a.py"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "<tool_call>\n{\"name\": \"get_weather\", \"arguments\": \"{\\\"city\\\": \\\"Paris\\\"}\"}\n</tool_call>",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "<tool_call>\n{\"name\": \"Get_Weather\", \"arguments\": {\"city\": \"Paris\"}}\n</tool_call>",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "<tool_call>\n{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}\n</tool_call>\n<tool_response>\n{\"temp\": 99}\n</tool_response>\nIt is 99 degrees.",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "<tool_call>\n{\"name\": \"bash\", \"arguments\": {\"command\": \"ls -la\"}}\n</tool_call>\nObservation: total 0\nThe directory is empty.",
+   "calls": [
+    {
+     "name": "bash",
+     "arguments": {
+      "command": "ls -la"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "<think>I should call <tool_call>{\"name\":\"bash\",\"arguments\":{\"command\":\"rm\"}}</tool_call></think>\n<tool_call>{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Paris\"}}</tool_call>",
+   "calls": [
+    {
+     "name": "get_weather",
+     "arguments": {
+      "city": "Paris"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": null,
+   "errors": [
+    null
+   ]
+  },
+  {
+   "text": "<tool_call>\n{\"name\": \"edit_file\", \"arguments\": {\"path\": \"a.py\", \"old_str\": \"x = 1\\n\", \"new_str\": \"x = 2\\n\"}}\n</tool_call>",
+   "calls": [
+    {
+     "name": "edit_file",
+     "arguments": {
+      "path": "a.py",
+      "old_str": "x = 1\n",
+      "new_str": "x = 2\n"
+     }
+    }
+   ],
+   "strategy": "hermes",
+   "remaining": "",
+   "errors": [
+    null
+   ]
+  }
+ ]
+}

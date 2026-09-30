@@ -1,0 +1,10 @@
+model:
+  provider: openai_compat
+  base_url: http://localhost:1234/v1
+  api_key: lm-studio
+  model: qwen2.5-coder-14b-instruct
+  native_tools: false             # use prompted tool calling
+  prompted_tool_format: hermes
+  context_window: 16384
+  max_output_tokens: 2048
+  schema_level: standard

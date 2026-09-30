@@ -1,0 +1,15 @@
+# Server: llama-server -m model.gguf --jinja -c 16384 --port 8080
+model:
+  provider: openai_compat
+  base_url: http://localhost:8080/v1
+  api_key: none
+  model: local
+  native_tools: true
+  context_window: 16384
+  max_output_tokens: 2048
+  schema_level: simple
+  tokenizer:
+    kind: server
+    url: http://localhost:8080/tokenize
+    request_field: content
+    count_path: "$.tokens"
